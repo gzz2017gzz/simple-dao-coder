@@ -2,29 +2,27 @@ package ${packageName};
 ${importList}
 import lombok.Getter;
 import lombok.Setter;
-import com.hq.common.base.annotation.Id;
-import com.hq.common.base.annotation.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
 <#if swagger == 1>
 import io.swagger.v3.oas.annotations.media.Schema;
 </#if>
-
 /**
- * @类说明 【${cnName}】实体
+ * @summary 【${cnName}】实体
  * @author ${author}
  * @date ${time}
  **/
 @Setter
 @Getter
-//@Builder
-//@AllArgsConstructor
-//@NoArgsConstructor
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 <#if swagger == 1>
-@Schema(description = "【${cnName}】实体")
+@Schema(name = "${ClassName}", description = "【${cnName}】实体")
 </#if>
-@Table("${tableName}")
 public class ${ClassName} {
 	// 字段↓
-	@Id
 <#list fields as field>
 <#if swagger == 1>
 	<#if field.fillType == 0 && field_index != 0>
@@ -33,8 +31,6 @@ public class ${ClassName} {
 	@Schema(description = "${field.comment}")
 	</#if>
 </#if>
-	private ${field.type} ${field.lower};<#if swagger != 1> /* ${field.comment} */</#if>
-	
+	private ${field.type} ${field.lower}; /* ${field.comment} */
 </#list>
-	/* 扩展(显示)属性↓@Exclude */
 }

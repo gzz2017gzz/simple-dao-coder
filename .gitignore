@@ -1,5 +1,8 @@
 /target/
 /.settings/
+/.idea/
 /.classpath
 /.project
 /logs/
+/.apt_generated/
+/.apt_generated_tests/

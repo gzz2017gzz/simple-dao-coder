@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset='UTF-8'>
+  <title>SimpleDAO代码生成器</title>
+  <link rel='stylesheet' type='text/css' href='js/element.css'>
+  <script type='text/javascript' src='js/vue.min.js'></script>
+  <script type='text/javascript' src='js/element-plus.js'></script>
+  <script type='text/javascript' src='js/axios.min.js'></script>
+</head>
+<body>
+  <div id='app' style='margin-top: 14px;'>
+    <div :style="pageWidth" style="margin: 0 auto;">
+      <el-form label-width="120px">
+        <el-row>
+          <el-col :span='6'>
+            <el-form-item label="选择数据库">
+              <el-select v-model='form.dbName' @change='queryTables'> <el-option v-for='db in databases' :key='db' :label='db' :value='db'></el-option></el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span='6'>
+            <el-form-item label="过滤表名"><el-input v-model='form.tableNameLike' placeholder='请输入表名前缀'></el-input></el-form-item>
+          </el-col>
+          <el-col :span='6'> <el-form-item label="作者名"><el-input v-model='form.author'></el-input></el-form-item> </el-col>
+          <el-col :span='6'> <el-form-item label="公司名"><el-input v-model='form.company'></el-input></el-form-item> </el-col>
+          <el-col :span='6'> <el-form-item label="项目名"><el-input v-model='form.itemName'></el-input></el-form-item> </el-col>
+          <el-col :span='6'> <el-form-item label="模块名"><el-input v-model='form.model'></el-input></el-form-item> </el-col>
+          <el-col :span='6'>
+            <el-form-item label="微服务名">
+              <el-select v-model='form.serverName' ><el-option v-for='s in servers' :key='s.name' :label='s.remark' :value='s.name'></el-option></el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span='6'>
+            <el-form-item label="swagger注解">
+              <el-radio-group v-model='form.swagger'><el-radio-button v-for='i in swagger' :label='i.label'>{{i.val}}</el-radio-button></el-radio-group>
+            </el-form-item>
+          </el-col>
+          <el-col :span='6'>
+            <el-form-item label="记录接口日志">
+              <el-radio-group v-model='form.log'><el-radio-button v-for='i in log' :label='i.label'>{{i.val}}</el-radio-button></el-radio-group>
+            </el-form-item>
+          </el-col>
+          <el-col :span='6'>
+            <el-form-item label="excel导入导出">
+              <el-radio-group v-model='form.excel'><el-radio-button v-for='i in excel' :label='i.label'>{{i.val}}</el-radio-button></el-radio-group>
+            </el-form-item>
+          </el-col>
+          <el-col :span='6'>
+            <el-form-item label="动态条件表格">
+              <el-radio-group v-model='form.columns'><el-radio-button v-for='i in columns' :label='i.label'>{{i.val}}</el-radio-button></el-radio-group>
+            </el-form-item>
+          </el-col>
+          <el-col :span='6'>
+            <el-form-item label="辅助字段">
+              <el-radio-group v-model='form.hidden'><el-radio-button v-for='i in hidden' :label='i.label'>{{i.val}}</el-radio-button></el-radio-group>
+            </el-form-item>
+          </el-col>
+          <el-col :span='12'>
+            <el-form-item label="模板选择">
+              <el-checkbox-group v-model='form.codeType' style='display: inline-block;margin-right:20px'>
+                <el-checkbox-button v-for='i in types' :label='i.val'>{{i.name}}</el-checkbox-button>
+              </el-checkbox-group>
+              <el-checkbox v-model="form.sys" @change="queryTables">系统表</el-checkbox>
+            </el-form-item>
+          </el-col>
+          <el-col :span='6'>
+            <el-form-item label="页面宽度">
+              <el-radio-group v-model='pageWidth'><el-radio-button v-for='i in widths' :label='i.label'>{{i.val}}</el-radio-button></el-radio-group>
+            </el-form-item>
+          </el-col>
+          <el-col :span='6'>
+            <el-form-item label="选择表名">
+              <el-button @click='()=>tableList.map(row => changeName(row))'type="primary" plain>切换类名</el-button>
+              <el-button @click='createCode' type="success">生成代码</el-button>
+            </el-form-item>
+          </el-col>
+        </el-row>
+      </el-form>
+      <el-table :data='filterTables' @selection-change='rows=>form.tables=rows' border :row-style='rowStyle' :header-cell-style='headCell' :header-row-style='headRow' :height='tableHeight'>
+        <el-table-column type='selection' width='40px'></el-table-column>
+        <el-table-column prop='tableName' label='表名'></el-table-column>
+        <el-table-column prop='comment' label='表名注释'></el-table-column>
+        <el-table-column label='建议类名(单击切换类名)'>
+          <template #default='props'><el-input v-model='props.row.className' @click.native="changeName(props.row)"></el-input></template>
+        </el-table-column>
+        <el-table-column label='类中文名(-可修改)'>
+          <template #default='props'><el-input v-model='props.row.cnName'></el-input></template>
+        </el-table-column>
+        <el-table-column label='字段明细' width='100px'>
+          <template #default='props'><el-button @click='queryFields(props.row.tableName)' type="primary" round>设置</el-button></template>
+        </el-table-column>
+      </el-table>
+      <div class='foot'>{{footer}}</div>
+      <el-dialog v-model='showDialog' title="字段明细-设置" top="100px" width="1400px">
+        <el-table :data='fields' border :row-style='rowStyle' :header-cell-style='headCell' :header-row-style='headRow' :height='dialogHeight'>
+          <el-table-column prop='name' label='字段名'></el-table-column>
+          <el-table-column prop='comment' label='字段注释'></el-table-column>
+          <el-table-column prop='type' label='JAVA数据类型'></el-table-column>
+          <el-table-column prop='fillType' label='表单组件类型' width='200px'>
+            <template #default='props'>
+              <el-select v-model='props.row.fillType' :disabled="props.row.fillType==0"><el-option v-for='f in fillTypes' :key='f.id' :label='f.val' :value='f.id'></el-option></el-select>
+            </template>
+          </el-table-column>
+          <el-table-column prop='dictKey' label='字典关键字' width='200px'>
+            <template #default='props'><el-input v-model='props.row.dictKey' v-if="props.row.fillType==3"></el-input></template>
+          </el-table-column>
+          <el-table-column prop='showColumn' label='表格列' width='200px'>
+            <template #default='props'>
+              <el-radio-group v-model='props.row.showColumn' :disabled="props.row.fillType==0"><el-radio-button v-for='i in showColumns' :label='i.id'>{{i.val}}</el-radio-button></el-radio-group>
+            </template>
+          </el-table-column>
+        </el-table>
+        <div style="text-align: right;padding-top: 24px;"><el-button @click="() => showDialog = false">取消</el-button><el-button @click="save" type="primary">保存</el-button></div>
+      </el-dialog>
+    </div>
+  </div>
+</body>
+<script>
+  axios.interceptors.response.use(res => res.data);
+  const app = Vue.createApp({
+    data() {
+      return {
+        footer: 'SimpleDAO代码生成器.基于:springboot-3.5.14;axios-1.6.5;vue-3.4.5;Element Plus v2.4.4.☂Version:2026-05-05 11:25:52☂',
+        form: {
+          dbName: null, hidden: true, tableNameLike: '', author: '高振中', company: 'hq', itemName: 'manage', serverName: "", model: 'bas',
+          swagger: '1', log: 1, excel: 1, codeType: ['element-list'], tables: [], columns: false,tableName: null,sys:true,quartz:false,
+        },
+        swagger: [{ label: '1', val: '使用' }, { label: '0', val: '不用' }], log: [{ label: 1, val: '使用' }, { label: 0, val: '不用' }],
+        excel: [{ label: 1, val: '使用' }, { label: 0, val: '不用' }], hidden: [{ label: true, val: '隐藏' }, { label: false, val: '显示' }],
+        columns: [{ label: true, val: '使用' }, { label: false, val: '不用' }],
+        widths: [{ label: 'width:calc(100vw - 24px);', val: '大' }, { label: 'width:calc(100vw/2 + 610px);', val: '中' }, { label: 'width:1220px;', val: '小' }],
+        types: [{ name: '常规表格', val: 'element-list' }, { name: '树型结构', val: 'element-tree' }, { name: 'OpenFeign', val: 'webapi' }, { name: 'Spring JDBC', val: 'jdbc' }],
+        fillTypes: [{ id: 0, val: '隐藏列' },{ id: 1, val: '输入框' }, { id: 2, val: '文本域' }, { id: 3, val: '字典下拉' }, { id: 4, val: '日期框' }, ],
+        showColumns: [{ id: 1, val: '显示' },{ id: 0, val: '隐藏' },],
+        databases: [], tableList: [], fields: [], showDialog: false, pageWidth: 'width:calc(100vw/2 + 610px);', servers: [],
+        headCell: { 'background': '#EDEDF2' }, headRow: { 'height': '30px' }, tableHeight: 'calc(100vh - 180px)', dialogHeight: 'calc(100vh - 380px)',
+        rowStyle: (obj) => obj.rowIndex % 2 == 0 ? {} : { background: '#FAFAFA' },
+        changeName:(row)=>{ let temp = row.className; row.className = row.fullName; row.fullName = temp; },
+      }
+    },
+    mounted() {
+      axios.post('/code/databases').then(res => {
+        if (res.code == 200) {
+          this.databases = res.data.databases;
+          this.form.dbName = res.data.dbName;
+          this.servers = res.data.servers;
+          this.queryTables();
+        } else this.$message.error(res.msg);
+      });
+    },
+    computed: {
+      filterTables() { return this.tableList.filter(item => item.tableName.indexOf(this.form.tableNameLike) != -1); },
+    },
+    methods: {
+      save() {
+        this.fields.map(f => { f.databaseName = this.form.dbName; f.tableName = this.tableName; f.fieldName = f.name; });
+        axios.post('/meta/saveBatch', this.fields).then(res => {
+          if (res.code == 200){
+            this.showDialog = false;
+            this.$message.success('设置成功!');
+          } else this.$message.error(res.msg);
+        });
+      },
+      queryTables() {
+        axios.post('/code/tables', this.form).then(res => {
+          if (res.code == 200) this.tableList = res.data;
+          else this.$message.error(res.msg);
+        });
+      },
+      queryFields(tableName) {
+        this.tableName = tableName;
+        this.showDialog = true;
+        axios.post('/code/fields', { tableName: tableName, hidden: this.form.hidden, dbName: this.form.dbName,sys:this.form.sys,quartz:this.form.quartz }).then(res => {
+          if (res.code == 200) { this.fields = res.data; } else this.$message.error(res.msg);
+        });
+      },
+      createCode() {
+        if (this.form.tables.length == 0) { this.$message({ message: '请至少选择一张表!', type: 'warning' }); return; }
+        if (this.form.codeType.length == 0) { this.$message({ message: '请至少选择一种模版!', type: 'warning' }); return; }
+        axios.post('/code/create', this.form).then(res => {
+          if (res.code == 200) location.href = '/code/downCode';
+          else this.$message.error(res.msg);
+        });
+      },
+    }
+  });
+  app.use(ElementPlus);
+  app.mount("#app");
+</script>
+<style>
+  .foot { line-height: 26px; height: 26px; width: 100%; background-color: #EDEDF2; text-align: center; font-size: 16px; font-weight: bold; }
+  .el-table .el-table__cell { padding: 0; font-size: 16px; line-height: 26px; }
+  .el-input__inner { padding: 0; font-size: 16px; height: 26px }
+  .el-radio-button__inner { padding: 4px 20px 4px 20px; font-size: 16px; }
+  .el-checkbox-button__inner { padding: 4px; font-size: 16px; }
+  .el-form-item__label { font-size: 16px; }
+  .el-button { padding: 4px; font-size: 16px; height: 24px; }
+  .el-form-item { margin-bottom: 0; }
+  .el-select { width: 100% }
+/* 自定义 el-table 滚动条滑块宽度 */
+::-webkit-scrollbar {
+  width: 10px !important ; /* 设置垂直滚动条的宽度 */
+  height: 10px !important;  /* 设置水平滚动条的高度 */
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #999; /* 滑块的颜色 */
+  border-radius: 5px; /* 滑块的圆角 */
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1; /* 轨道的背景颜色 */
+}
+
+/* 针对 el-table 的特定样式 */
+.el-table__body-wrapper::-webkit-scrollbar {
+  width: 10px; /* 设置垂直滚动条的宽度 */
+}
+
+.el-table__body-wrapper::-webkit-scrollbar-thumb {
+  background-color: #999; /* 滑块的颜色 */
+  border-radius: 5px; /* 滑块的圆角 */
+}
+
+.el-table__body-wrapper::-webkit-scrollbar-track {
+  background: #f1f1f1; /* 轨道的背景颜色 */
+}
+ 
+</style>
+</html>

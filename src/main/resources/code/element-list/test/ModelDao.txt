@@ -1,0 +1,139 @@
+package ${packageName};
+
+import java.util.List;
+import org.springframework.stereotype.Repository;
+import com.gzz.common.base.BaseDao;
+import com.gzz.common.base.Page;
+import lombok.extern.slf4j.Slf4j;
+
+/**
+ * @类说明 【${cnName}】数据访问层
+ * @author ${author}
+ * @date ${time}
+ **/
+@Slf4j
+@Repository
+public class ${ClassName}Dao extends BaseDao {
+//	${ClassName}Dao() { checkTableRef = true; /*启用删除时外键检查*/ } 
+	/**
+	 * @方法说明 【${cnName}】新增
+	 */
+	public int save(${ClassName} po) {
+		String sql ="""
+		INSERT INTO ${tableName} (${insertFields})
+		VALUES (${insertValues})
+		""";
+		Object[] param = {${insertParams} };
+		//log.info(Sql.parse(sql, param));// 显示SQL语句
+		return update(sql, param);
+	}
+
+	/**
+	 * @方法说明 【${cnName}】删除
+	 */
+	public int delete(Object[] ids) {
+		String sql = "DELETE FROM ${tableName} WHERE ${id_name} IN" + toIn(ids);
+		//log.info(Sql.parse(sql, ids));// 显示SQL语句
+		return update(sql, ids);
+	}
+
+	/**
+	 * @方法说明 【${cnName}】修改
+	 */
+	public int update(${ClassName} po) {
+		String sql ="""
+		UPDATE ${tableName} SET ${updateFields}
+		WHERE ${id_name}=?
+		""";
+		Object[] param = {${updateValues} };
+		//log.info(Sql.parse(sql, param));// 显示SQL语句
+		return update(sql, param);
+	}
+
+	/**
+	 * @方法说明 【${cnName}】分页列表
+	 */
+	public Page<${ClassName}> page(${ClassName}Cond cond) {
+		String sql ="""
+		SELECT ${selectFields}
+		FROM ${tableName} t
+		""";
+		log.info(Sql.parse(sql + cond.where(), cond.array()));// 显示SQL语句
+		return page(sql + cond.where(), cond, ${ClassName}.class);
+	}
+
+	/**
+	 * @方法说明 【${cnName}】列表
+	 */
+	public List<${ClassName}> list(${ClassName}Cond cond) {
+		String sql ="""
+		SELECT ${selectFields}
+		FROM ${tableName} t
+		//log.info(Sql.parse(sql + cond.where(),cond.array()));//显示SQL语句
+		return list(sql + cond.where(), cond, ${ClassName}.class);
+	}
+
+	/**
+	 * @方法说明 【${cnName}】按主键查
+	 */
+	public ${ClassName} findById(${idType} id) {
+		String sql ="""
+		SELECT ${selectFields}
+		FROM ${tableName} t WHERE t.${id_name}=?
+		""";
+		//log.info(Sql.parse(sql,id));//显示SQL语句
+		return findById(sql, ${ClassName}.class, id);
+	}
+
+	/**
+	 * @方法说明 【${cnName}】个数
+	 */
+	public int count(${ClassName}Cond cond) {
+		String sql = "SELECT COUNT(1) FROM ${tableName} t " + cond.where();
+		// log.info(sql(sql,cond.array()));//显示SQL语句
+		return count(sql, cond);
+	}
+
+	/**
+	 * @方法说明 【${cnName}】新增并返回自增涨主键
+	 */
+	public int saveReturnPK(${ClassName} vo) {
+		String sql ="""
+		INSERT INTO ${tableName} (${insertFields})
+		VALUES (${insertParamsBatch})
+		""";
+		//log.info(sqlp(sql, vo));// 显示SQL语句
+		return saveKey(vo, sql, "${id_name}");
+	}
+
+	/**
+	 * @方法说明 【${cnName}】批量插入
+	 */
+	public int[] insertBatch(List<${ClassName}> ${className}s) {
+		String sql ="""
+		INSERT INTO ${tableName} (${insertFields})
+		VALUES (${insertParamsBatch})
+		""";
+		//log.info(sqlp(sql, list));// 显示SQL语句
+		return batchOperate(${className}s, sql);
+	}
+	/**
+	 * @方法说明 【${cnName}】批量更新
+	 */
+	public int[] updateBatch(List<${ClassName}> ${className}s) {
+		String sql ="""
+		UPDATE ${tableName} SET ${updateParamsBatch}
+		WHERE ${id_name}=:${idName}
+		""";
+		//log.info(sqlp(sql, list));// 显示SQL语句
+		return batchOperate(${className}s, sql);
+	}
+	/**
+	 * @方法说明 【${cnName}】逻辑删除
+	 */
+//	public int delete(Object... ids) {
+//		String sql = "UPDATE ${tableName} SET dr=1 WHERE ${id_name} IN " + toIn(ids);
+//		return update(sql,ids);
+//	}	
+
+}

@@ -1,22 +1,18 @@
-package ${pName};
+package ${packageName};
 ${importList}
-import java.util.List;
-
-import com.gzz.common.base.BaseCondition;
-
-import lombok.AllArgsConstructor;
+import com.hq.common.base.BaseCondition;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 <#if swagger == 1>
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 </#if>
 
 /**
- * @类说明 【${cName}】查询条件
- * @author ${auth}
+ * @类说明 【${cnName}】查询条件
+ * @author ${author}
  * @date ${time}
  **/
 @Setter
@@ -26,35 +22,68 @@ import io.swagger.annotations.ApiModelProperty;
 @AllArgsConstructor
 @NoArgsConstructor
 <#if swagger == 1>
-@ApiModel(description = "【${cName}】查询条件")
+@Schema(description = "【${cnName}】查询条件")
 </#if>
-public class ${upp}Cond extends BaseCondition {
+public class ${ClassName}Cond extends BaseCondition {
 
 	/**
-	 * @方法说明: 拼加自定义条件
+	 * @方法说明 拼加条件
 	 **/
 	@Override
-	public void addCondition() {
-<#list fList as fi>
-<#if fi.type == "String">
-		add("AND t.${fi.name} LIKE ?", ${fi.name}, 3);
-<#else>
-		add("AND t.${fi.name} = ?", ${fi.name});
-</#if>
+	protected void addCondition() {
+<#list fields as field>
+	<#if field.fillType != 0 || field.name == 'dr'>
+    	<#if field.type == "String">
+		and("${field.name} LIKE", ${field.lower}, 3);
+    	<#elseif field.fillType == 4>
+		and("${field.name} >=", ${field.lower}Start);
+		and("${field.name} <=", ${field.lower}End);
+		<#else>
+		and("${field.name} =", ${field.lower});
+    	</#if>
+	</#if>
 </#list>
-		add("AND t.id IN", ids);
+		in("${id_name}", ${idName}s);
+		// notIn("${id_name}", ${id_name}sNot);
 	}
 
-	// 以下为查询条件
-<#list fList as fi>
-<#if swagger == 1>
-	@ApiModelProperty("${fi.comment}")
-</#if>
-	private ${fi.type} ${fi.name}; // ${fi.comment}
+	/* 默认条件↓ */
+<#list fields as field>
+	<#if field.fillType != 0 || field.name == 'dr'>
+		<#if swagger == 1>
+  			<#if field.fillType == 4>
+	@Schema(description = "${field.comment}开始")
+	private ${field.type} ${field.lower}Start;
+	
+	@Schema(description = "${field.comment}结束")
+	private ${field.type} ${field.lower}End;
+	
+  			<#elseif field.fillType != 4>
+	@Schema(description = "${field.comment}")
+	private ${field.type} ${field.lower};
+	
+  			</#if>
+		<#else>
+  			<#if field.fillType == 4>
+	private ${field.type} ${field.lower}Start; /* ${field.comment}开始 */
+	
+	private ${field.type} ${field.lower}End; /* ${field.comment}结束 */
+	
+  			<#elseif field.fillType != 4>
+	private ${field.type} ${field.lower}; /* ${field.comment} */
+
+  			</#if>
+		</#if>
+	</#if>
 </#list>
 <#if swagger == 1>
-	@ApiModelProperty("主键数组")
+	@Schema(description = "包含主键(集)")
 </#if>
-	private List<Object> ids;// 主键列表
-	// 以下为自定义查询条件
+	private Object[] ${idName}s;<#if swagger != 1> /* 包含主键(集) */</#if>
+	
+	/* 自定义条件↓ */
+<#if swagger == 1>
+	// @Schema(description = "排除主键(集)")
+</#if>
+	// private Object[] ${idName}sNot;<#if swagger != 1> /* 排除主键(集) */</#if>
 }

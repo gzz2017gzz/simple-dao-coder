@@ -1,0 +1,34 @@
+//////////////////////////////自定义条件参数建议/////////////////////////////////////
+
+
+
+<#list fields as field>
+<#if field.name != "dr" && field.name != "createTime" && field.name != "createBy" && field.name != "updateTime" && field.name != "updateBy">
+//${cnName}(${tableName})表做为【主表】时,拼接${field.name}(${field.comment})条件
+and("${field.name}=", ${field.lower});
+and("${field.name}=", ${field.lower}Eq);
+and("${field.name} LIKE", ${field.name}Like,3);
+and("${field.name}>", ${field.lower}Gt);
+and("${field.name}>", ${field.lower}Lt);
+and("${field.name}<>", ${field.lower}Ne);
+//${cnName}(${tableName})表做为【非主表】时,拼接${field.name}(${field.comment})条件,别名a根据实情况替换
+add("AND a.${field.name}=?", ${field.lower});
+add("AND a.${field.name}=?", ${field.lower}Eq);
+add("AND a.${field.name} LIKE ?", ${field.name}Like,3);
+add("AND a.${field.name}>?", ${field.lower}Gt);
+add("AND a.${field.name}>?", ${field.lower}Lt);
+add("AND a.${field.name}<>?", ${field.lower}Ne);
+//字段定义
+private ${field.type} ${field.lower}; /* ${field.comment}-等于(优先)*/
+private ${field.type} ${field.lower}Eq; /* ${field.comment}-等于(其次)*/ 
+private ${field.type} ${field.lower}Like; /* ${field.comment}-模糊*/ 
+private ${field.type} ${field.lower}Gt; /* ${field.comment}-大于*/ 
+private ${field.type} ${field.lower}Lt; /* ${field.comment}-小于*/ 
+private ${field.type} ${field.lower}Ne; /* ${field.comment}-不等于*/ 
+
+
+</#if>
+<#if field.fillType == 3>
+export const ${field.lower}Format = (row, column) => getItemValue('${field.lower}', row[column.property]);  //问题类型
+</#if>
+</#list>
