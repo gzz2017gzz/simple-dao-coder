@@ -11,7 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 /**
  * @summary 【元数据】数据访问层
  * @author 高振中
- * @date 2026-05-05 11:25:52
+ * @date 2026-08-16 16:32:28
  **/
 @Slf4j
 @Repository

@@ -11,7 +11,8 @@ spring:
     name: coder
   sql:
     init:
-      mode: always    
+      mode: always
+      schema-locations: classpath:schema-${custom.meta-database}.sql  
 custom: 
   meta-database: mysql  # 数据库类型，不配默认 mysql。可选值：mysql / postgresql / oracle / sqlserver
   excludes: ["flyway_schema_history","coder_meta","coder_server"] #排除的表

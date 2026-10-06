@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,7 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class ${ClassName}Service {
 
-	@Autowired
+	@Resource
 	private ${ClassName}Dao ${className}Dao; // 注入【${cnName}】数据访问层
 	/**
 	 * @方法说明 【${cnName}】树:按主键顺序查询所有记录,只要保证子结点出现在父结点的后面就可以一次遍历将list整理成树型结构

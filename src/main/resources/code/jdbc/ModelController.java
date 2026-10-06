@@ -6,7 +6,7 @@ import com.${company}.common.tools.SysTools;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.bind.annotation.RequestPart;
 </#if>
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.annotation.Resource;
 import org.springframework.http.HttpEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -37,7 +37,7 @@ import io.swagger.v3.oas.annotations.Operation;
 @RequestMapping("${classname}")
 public class ${ClassName}Controller {
 
-	@Autowired
+	@Resource
 	private ${ClassName}Service ${className}Service; // 注入【${cnName}】业务逻辑层
 
 	/**

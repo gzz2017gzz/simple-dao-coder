@@ -9,7 +9,7 @@ import static com.gzz.common.config.Const.INT_1;
 /**
  * @summary 系统工具
  * @author 高振中
- * @date 2026-05-05 11:25:52
+ * @date 2026-08-16 16:32:28
  **/
 public final class SysTools {
 	private SysTools() { }

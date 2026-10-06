@@ -1,7 +1,7 @@
 package ${packageName};
 
 import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -25,7 +25,7 @@ import io.swagger.v3.oas.annotations.Operation;
 </#if>
 public class ${ClassName}Controller {
 
-	@Autowired
+	@Resource
 	private ${ClassName}Service ${className}Service; // 注入【${cnName}】业务逻辑层
 	
 	<#if swagger != 1>

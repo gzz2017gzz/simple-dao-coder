@@ -1,6 +1,6 @@
 package ${packageName};
 
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import com.hq.common.base.Page;
 <#if excel == 1>
@@ -18,7 +18,7 @@ import java.util.List;
 @Service
 public class ${ClassName}Service {
 
-	@Autowired
+	@Resource
 	private ${ClassName}Dao ${className}Dao; // 注入【${cnName}】数据访问层
 
 	/**

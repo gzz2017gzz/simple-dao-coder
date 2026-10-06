@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.stereotype.Service;
 
@@ -44,22 +43,23 @@ import com.gzz.system.meta.MetaCondition;
 import com.gzz.system.meta.MetaDao;
 
 import jakarta.annotation.PostConstruct;
+import jakarta.annotation.Resource;
 import lombok.SneakyThrows;
 
 /**
  * @summary 生成器逻辑实现
  * @author 高振中
- * @date 2026-05-05 11:25:52
+ * @date 2026-08-16 16:32:28
  **/
 @Service
 public final class CodeService {
 
 	private static List<String> templates;// 模板文件集
-	@Autowired
+	@Resource
 	private CodeDao codeDao;// 注入数据访问类
-	@Autowired
+	@Resource
 	private Config config;// 注入排除表的配置
-	@Autowired
+	@Resource
 	private MetaDao metaDao; // 注入【元数据】数据访问层
 
 	/**

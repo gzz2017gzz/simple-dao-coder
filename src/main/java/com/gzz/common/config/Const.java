@@ -7,7 +7,7 @@ import freemarker.template.Configuration;
 /**
  * @summary 常量接口
  * @author 高振中
- * @date 2026-05-05 11:25:52
+ * @date 2026-08-16 16:32:28
  **/
 public interface Const {
 	String MODEL = "Model";// 模板中表名标识

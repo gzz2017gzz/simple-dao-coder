@@ -7,7 +7,7 @@ import lombok.Setter;
 /**
  * @summary 【服务名】实体
  * @author 高振中
- * @date 2026-05-05 11:25:52
+ * @date 2026-08-16 16:32:28
  **/
 @Setter
 @Getter

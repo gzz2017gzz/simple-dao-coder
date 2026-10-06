@@ -11,7 +11,7 @@ import lombok.Setter;
 /**
  * @author 高振中
  * @summary 查询条件
- * @date 2026-05-05 11:25:52
+ * @date 2026-08-16 16:32:28
  **/
 @Setter
 @Getter

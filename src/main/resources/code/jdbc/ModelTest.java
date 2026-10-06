@@ -2,7 +2,7 @@ package ${packageName};
 ${importList}
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.annotation.Resource;
 import org.springframework.boot.test.context.SpringBootTest;
 import com.${company}.common.base.Page;
 import lombok.extern.slf4j.Slf4j;
@@ -14,7 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @SpringBootTest
 public class ${ClassName}Test {
-	@Autowired
+	@Resource
 	${ClassName}Dao ${className}Dao; // 注入【${cnName}】数据访问层
 	/**
 	 * 测试 新增【${cnName}】,根据数据类型修改每个字段的值

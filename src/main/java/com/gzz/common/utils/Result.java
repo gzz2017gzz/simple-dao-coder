@@ -9,7 +9,7 @@ import lombok.Setter;
 /**
  * @summary 【反回结果】包装
  * @author 高振中
- * @date 2026-05-05 11:25:52
+ * @date 2026-08-16 16:32:28
  **/
 @Setter
 @Getter

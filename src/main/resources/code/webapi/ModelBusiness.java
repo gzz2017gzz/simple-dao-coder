@@ -1,7 +1,7 @@
 package ${packageName};
 
 import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import com.gzz.common.base.Page;
 import com.gzz.common.config.Result;
@@ -13,7 +13,7 @@ import com.gzz.common.config.Result;
 @Service
 public class ${ClassName}Business {
 
-	@Autowired
+	@Resource
 	private I${ClassName}Client ${className}Client; //注入[${cnName}]客户端
 
 	/**

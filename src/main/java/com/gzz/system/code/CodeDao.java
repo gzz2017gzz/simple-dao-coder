@@ -1,5 +1,6 @@
 package com.gzz.system.code;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -14,9 +15,9 @@ import com.simple.common.base.BaseDao;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * @summary 数据访问类（支持 MySQL / MariaDB / PostgreSQL / Oracle / SQL Server）
+ * @summary 数据访问类（支持 MySQL,MariaDB / PostgreSQL / Oracle / SQL Server）
  * @author 高振中
- * @date 2026-05-05 11:25:52
+ * @date 2026-08-16 16:32:28
  **/
 @Slf4j
 @Repository
@@ -126,7 +127,7 @@ public class CodeDao extends BaseDao<Meta> {
      */
     public String dbName() {
         return switch (metaDatabase.toLowerCase()) {
-            case "postgresql" -> field("SELECT current_database()", String.class);
+            case "postgresql" -> "public";
             case "oracle" -> field("SELECT ORA_DATABASE_NAME FROM DUAL", String.class);
             case "sqlserver" -> field("SELECT DB_NAME()", String.class);
             default -> field("SELECT DATABASE()", String.class);
@@ -138,11 +139,7 @@ public class CodeDao extends BaseDao<Meta> {
      */
     public List<String> databases() {
         return switch (metaDatabase.toLowerCase()) {
-            case "postgresql" -> {
-                List<String> dbs = columns("SELECT datname FROM pg_catalog.pg_database WHERE datistemplate = false", String.class);
-                dbs.removeIf(db -> db.equals("postgres"));
-                yield dbs;
-            }
+            case "postgresql" -> new ArrayList<String>(List.of("public"));
             case "oracle" -> columns("SELECT username FROM all_users", String.class);
             case "sqlserver" -> columns("SELECT name FROM sys.databases", String.class);
             default -> columns("SHOW DATABASES", String.class);
